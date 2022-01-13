@@ -17,6 +17,10 @@ syntax = "proto3";
 
 package pir;
 
+service Query {
+  rpc sendQuery (Request) returns (Response) {}
+}
+
 // A set of ciphertexts, used for queries or responses.
 message Ciphertexts {
   repeated bytes ct = 1;
