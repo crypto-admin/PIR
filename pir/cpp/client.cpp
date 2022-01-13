@@ -22,6 +22,8 @@
 #include "pir/cpp/utils.h"
 #include "seal/seal.h"
 
+
+
 namespace pir {
 
 using absl::InternalError;
@@ -31,6 +33,7 @@ using ::seal::Ciphertext;
 using ::seal::GaloisKeys;
 using ::seal::Plaintext;
 using ::seal::RelinKeys;
+
 
 PIRClient::PIRClient(std::unique_ptr<PIRContext> context)
     : context_(std::move(context)) {}

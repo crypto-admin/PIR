@@ -58,6 +58,45 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "pir_client",
+    srcs = [
+        "client_main.cpp",
+        "client.cpp",
+        "context.cpp",
+        "context.h",
+        "ct_reencoder.cpp",
+        "ct_reencoder.h",
+        "database.cpp",
+        "database.h",
+        "parameters.cpp",
+        "parameters.h",
+        "serialization.cpp",
+        "serialization.h",
+        "server.cpp",
+        "status_asserts.h",
+        "string_encoder.cpp",
+        "string_encoder.h",
+        "utils.cpp",
+        "utils.h",
+        "client.h",
+        "server.h",
+    ],
+    copts = PIR_DEFAULT_COPTS,
+    includes = PIR_DEFAULT_INCLUDES,
+    deps = [
+        "//pir/proto:payload_cc_grpc",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:optional",
+        "@com_google_absl//absl/types:span",
+        "@com_microsoft_seal//:seal",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+
 cc_test(
     name = "pir_test",
     srcs = [
