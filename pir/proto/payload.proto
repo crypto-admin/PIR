@@ -19,6 +19,7 @@ package pir;
 
 service Query {
   rpc sendQuery (Request) returns (Response) {}
+  rpc sayHello (HelloRequest) returns (HelloReply) {}
 }
 
 // A set of ciphertexts, used for queries or responses.
@@ -70,4 +71,16 @@ message PIRParameters {
 
     // Set this to true to use CT multiplication instead of decomposition
     bool use_ciphertext_multiplication = 8;
+}
+
+
+// hello proto for test
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
 }

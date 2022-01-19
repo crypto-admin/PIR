@@ -28,7 +28,9 @@
 #include "pir/proto/payload.grpc.pb.h"
 
 #include "pir/cpp/server.h"
+#include "pir/cpp/server_impl.h"
 #include "seal/seal.h"
+#include "pir/cpp/database.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -37,16 +39,33 @@ using grpc::Status;
 using pir::Request;
 using pir::Response;
 using pir::Query;
+using pir::HelloRequest;
+using pir::HelloReply;
 using namespace pir; 
+using namespace std;
 
 
 // Logic and data behind the server's behavior.
 class GreeterServiceImpl final : public Query::Service {
   grpc::Status sendQuery(ServerContext* context, const Request* request,
                  Response* reply) override {
-    std::string prefix("Hello ");
-    // reply->set_message(prefix + request->name());
+    PIRServerImpl impl = PIRServerImpl(10);
+    impl.SetUp();
+    std::cout << "stw1 : " << std::endl;
+    auto test_reply = impl.server_->ProcessRequest(*request);
+    std::cout << "server ProcessRequest finish." << test_reply.ok() << std::endl;
+    *reply = *test_reply;
+    std::cout << "reply size : "  << test_reply->reply_size() << std::endl;
+    
+    std::cout << "server reply :" << std::endl;
 
+    return grpc::Status::OK;
+  }
+  // Hello imple just for test.
+  grpc::Status sayHello(ServerContext* context, const HelloRequest* request,
+                  HelloReply* reply) override {
+    std::string prefix("Hello ");
+    reply->set_message(prefix + request->name());
     return grpc::Status::OK;
   }
 };

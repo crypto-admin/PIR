@@ -18,7 +18,10 @@ using pir::Response;
 using pir::Query;
 using grpc::ClientContext;
 using pir::Ciphertexts;
+using pir::HelloRequest;
+using pir::HelloReply;
 using namespace pir; 
+
 
 
 class PirQuery {
@@ -37,9 +40,10 @@ class PirQuery {
     // // ct->set_ct(0, query);
     // ct->add_ct(query);
     
-    std::cout << "test2" << std::endl;
+    // whether query is correct;
+    std::cout << "sendPubkeyA: " << query.galois_keys().size() << std::endl;
 
-
+  
     // Container for the data we expect from the server.
     Response reply;
 
@@ -49,6 +53,37 @@ class PirQuery {
 
     // The actual RPC.
     stub_->sendQuery(&context, query, &reply);
+
+    return "OK";
+  }
+
+  std::string SayHello(const std::string& user) {
+    // Data we are sending to the server.
+    HelloRequest request;
+    request.set_name(user);
+
+    // Container for the data we expect from the server.
+    HelloReply reply;
+
+    // Context for the client. It could be used to convey extra information to
+    // the server and/or tweak certain RPC behaviors.
+    ClientContext context;
+
+    // The actual RPC.
+    grpc::Status status = stub_->sayHello(&context, request, &reply);
+    // Act upon its status.
+      // Act upon its status.
+    if (status.ok()) {
+      return reply.message();
+    } else {
+      std::cout << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return "RPC failed";
+    }
+    // Process reply;
+    
+
+
   }
 
  private:
@@ -56,39 +91,41 @@ class PirQuery {
 };
 
 int main() {
-  printf("sender starting..");
+  std::cout << "inter main " << std::endl;
   int ret = 0;
 
   std::string target_str = "localhost:50051";
   PirQuery pirclient(grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
-  std::string pubkeyA("12345688888888889999999");
+
   // generate query;
+  std::string user("world");
+  std::string hello_reply = pirclient.SayHello(user);
+  std::cout << "Greeter received: " << hello_reply << std::endl;
 
   EncryptionParameters encryption_params_;
   constexpr uint32_t POLY_MODULUS_DEGREE = 4096;
-  encryption_params_ = GenerateEncryptionParams(POLY_MODULUS_DEGREE, 16);
-  int dbsize = 100;
-  int elem_size = 16;
+  encryption_params_ = GenerateEncryptionParams(POLY_MODULUS_DEGREE, 20);
+  int dbsize = 10;
+  int elem_size = 7680;
   int dimensions = 1;
   shared_ptr<PIRParameters> pir_params_ =
         *(CreatePIRParameters(dbsize, elem_size, dimensions, encryption_params_,
                               false));
   std::unique_ptr<PIRClient> client_ = *(PIRClient::Create(pir_params_));
 
+  std::cout << "params count =" << pir_params_->num_pt() << std::endl;
+
   const size_t desired_index = 5;
   const vector<size_t> indices = {desired_index};
 
   auto req_proto = client_->CreateRequest(indices);
   if (req_proto.ok()) {
-    req_proto->query_size();
+    std::cout << "req size = " << req_proto->query_size() << std::endl;
   }
-  std::string res;
-  // std::cout << "ok = " << req_proto.value().SerializePartialToString(&res) << std::endl;
   // std::cout << "res t= " << res << std::endl;
-  std::string reply = pirclient.SendPubkeyA((*req_proto));
-  // std::cout << "ot12 pubA reply = " <<  reply  << std::endl;
+  std::string reply = pirclient.SendPubkeyA(*req_proto);
+  std::cout << "ot12 pubA reply = " <<  reply  << std::endl;
 
-  printf("have sendt pubkey to client.\n");
 
   return 0;
 }

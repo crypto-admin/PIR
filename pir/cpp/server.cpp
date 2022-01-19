@@ -35,6 +35,7 @@ PIRServer::PIRServer(std::unique_ptr<PIRContext> context,
 StatusOr<std::unique_ptr<PIRServer>> PIRServer::Create(
     std::shared_ptr<PIRDatabase> db, shared_ptr<PIRParameters> params) {
   if (params->num_pt() != db->size()) {
+    std::cout << "diff = " << params->num_pt() << " != " << db->size() << std::endl;
     return absl::InvalidArgumentError("database size mismatch");
   }
   ASSIGN_OR_RETURN(auto context, PIRContext::Create(params));
@@ -46,21 +47,23 @@ StatusOr<Response> PIRServer::ProcessRequest(const Request& request) const {
   ASSIGN_OR_RETURN(auto galois_keys,
                    SEALDeserialize<GaloisKeys>(context_->SEALContext(),
                                                request.galois_keys()));
+  std::cout << "inter proces..dd" << std::endl;
 
   const auto dimensions = context_->Params()->dimensions();
   const size_t dim_sum = context_->DimensionsSum();
-
+  std::cout << "inter proces..d" << std::endl;
   optional<RelinKeys> relin_keys;
   if (!request.relin_keys().empty()) {
     ASSIGN_OR_RETURN(relin_keys,
                      SEALDeserialize<RelinKeys>(context_->SEALContext(),
                                                 request.relin_keys()));
-  }
-
+  } 
+  std::cout << "inter proces..h" << std::endl;
   for (const auto& query : request.query()) {
     RETURN_IF_ERROR(processQuery(query, galois_keys, relin_keys, dim_sum,
                                  response.add_reply()));
   }
+  std::cout << "process request result = " << response.reply_size() << std::endl;
   return response;
 }
 
