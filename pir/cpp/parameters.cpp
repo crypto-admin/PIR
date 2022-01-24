@@ -45,7 +45,7 @@ EncryptionParameters GenerateEncryptionParams(
       seal::PlainModulus::Batching(poly_modulus_degree, 20));
   auto coeff =
       coeff_opt.value_or(seal::CoeffModulus::BFVDefault(poly_modulus_degree));
-
+ 
   EncryptionParameters parms(seal::scheme_type::BFV);
   parms.set_poly_modulus_degree(poly_modulus_degree);
   parms.set_plain_modulus(plain_modulus);
@@ -86,15 +86,10 @@ StatusOr<shared_ptr<PIRParameters>> CreatePIRParameters(
       return InvalidArgumentError("Cannot fit an item within one plaintext");
     }
     size_t num_pt = dbsize / parameters->items_per_plaintext();
-
-    std::cout << "aal = " << parameters->items_per_plaintext() << std::endl;
-
-     std::cout << "dbsize = " << dbsize <<  "inner ptnum init = " << num_pt << std::endl;
-
     while (dbsize > num_pt * parameters->items_per_plaintext()) {
       ++num_pt;
     }
-    std::cout << "inner ptnum = " << num_pt << std::endl;
+    
     parameters->set_num_pt(num_pt);
   } else {
     parameters->set_bytes_per_item(encoder.max_bytes_per_plaintext());

@@ -47,18 +47,17 @@ StatusOr<Response> PIRServer::ProcessRequest(const Request& request) const {
   ASSIGN_OR_RETURN(auto galois_keys,
                    SEALDeserialize<GaloisKeys>(context_->SEALContext(),
                                                request.galois_keys()));
-  std::cout << "inter proces..dd" << std::endl;
 
   const auto dimensions = context_->Params()->dimensions();
   const size_t dim_sum = context_->DimensionsSum();
-  std::cout << "inter proces..d" << std::endl;
+
   optional<RelinKeys> relin_keys;
   if (!request.relin_keys().empty()) {
     ASSIGN_OR_RETURN(relin_keys,
                      SEALDeserialize<RelinKeys>(context_->SEALContext(),
                                                 request.relin_keys()));
   } 
-  std::cout << "inter proces..h" << std::endl;
+  
   for (const auto& query : request.query()) {
     RETURN_IF_ERROR(processQuery(query, galois_keys, relin_keys, dim_sum,
                                  response.add_reply()));

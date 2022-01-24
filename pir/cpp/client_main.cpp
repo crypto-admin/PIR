@@ -1,5 +1,6 @@
 #include "pir/cpp/client.h"
 #include "seal/seal.h"
+#include "pir/cpp/server_impl.h"
 
 // add by byte
 #include "pir/proto/payload.grpc.pb.h"
@@ -31,7 +32,7 @@ class PirQuery {
 
   // Assembles the client's payload, sends it and presents the response back
   // from the server.
-  std::string SendPubkeyA(const pir::Request& query) {
+  pir::Response SendPubkeyA(const pir::Request& query) {
     // Data we are sending to the server.
     // Request request;
     // Ciphertexts* ct;
@@ -54,7 +55,8 @@ class PirQuery {
     // The actual RPC.
     stub_->sendQuery(&context, query, &reply);
 
-    return "OK";
+    return reply;
+    //return "OK";
   }
 
   std::string SayHello(const std::string& user) {
@@ -81,9 +83,6 @@ class PirQuery {
       return "RPC failed";
     }
     // Process reply;
-    
-
-
   }
 
  private:
@@ -110,22 +109,38 @@ int main() {
   int dimensions = 1;
   shared_ptr<PIRParameters> pir_params_ =
         *(CreatePIRParameters(dbsize, elem_size, dimensions, encryption_params_,
-                              false));
-  std::unique_ptr<PIRClient> client_ = *(PIRClient::Create(pir_params_));
+                              true));
 
-  std::cout << "params count =" << pir_params_->num_pt() << std::endl;
+
+  
+  std::unique_ptr<PIRClient> client_ = *(PIRClient::Create(pir_params_));
 
   const size_t desired_index = 5;
   const vector<size_t> indices = {desired_index};
+  std::vector<size_t> desired_indices = {desired_index};
 
-  auto req_proto = client_->CreateRequest(indices);
+  // auto req_proto = client_->CreateRequest(indices);
+  // if (req_proto.ok()) {
+  //   std::cout << "req size = " << req_proto->query_size() << std::endl;
+  // }
+  // pir::Response reply = pirclient.SendPubkeyA(*req_proto);
+  ///////////////////////////
+  //self create reply;
+  PIRServerImpl impl = PIRServerImpl(10);
+  impl.SetUp();
+  auto req_proto = impl.client_->CreateRequest(indices);
   if (req_proto.ok()) {
-    std::cout << "req size = " << req_proto->query_size() << std::endl;
+     std::cout << "req size = " << req_proto->query_size() << std::endl;
   }
-  // std::cout << "res t= " << res << std::endl;
-  std::string reply = pirclient.SendPubkeyA(*req_proto);
-  std::cout << "ot12 pubA reply = " <<  reply  << std::endl;
 
+  pir::Response reply = pirclient.SendPubkeyA(*req_proto);
+
+  ///////////////////////////
+
+  auto res = client_->ProcessResponse(desired_indices, reply);
+   
+  if (res.ok()) {std::cout << "finish ok" << std::endl;}
+  else std::cout << "erroro " << res.status() << std::endl;
 
   return 0;
 }

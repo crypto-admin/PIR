@@ -81,6 +81,9 @@ cc_binary(
         "utils.h",
         "client.h",
         "server.h",
+        "server_impl.h",
+        "test_base.h",
+        "test_base.cpp",
     ],
     copts = PIR_DEFAULT_COPTS,
     includes = PIR_DEFAULT_INCLUDES,
@@ -93,6 +96,7 @@ cc_binary(
         "@com_google_absl//absl/types:span",
         "@com_microsoft_seal//:seal",
         "@com_github_grpc_grpc//:grpc++",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -121,6 +125,7 @@ cc_binary(
         "utils.cpp",
         "utils.h",
         "client.h",
+        "client.cpp",
         "server.h",
     ],
     copts = PIR_DEFAULT_COPTS,

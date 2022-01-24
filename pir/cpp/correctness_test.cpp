@@ -64,6 +64,7 @@ class PIRCorrectnessTest
     const auto bits_per_coeff = get<4>(GetParam());
     const auto dbsize = get<5>(GetParam());
     const auto d = get<6>(GetParam());
+    
 
     SetUpParams(dbsize, elem_size, d, poly_modulus_degree, plain_mod_bits,
                 bits_per_coeff, use_ciphertext_multiplication);

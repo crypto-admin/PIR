@@ -123,10 +123,18 @@ Status StringEncoder::encode(vector<string>::const_iterator v,
 
 StatusOr<string> StringEncoder::decode(const Plaintext& pt, size_t length,
                                        size_t byte_offset) const {
+    std::cout << " debug = " << length <<  std::endl;
+    std::cout << " debug = " << pt.coeff_count() <<  std::endl;
+    std::cout << " debug = " << bits_per_coeff_  <<  std::endl;
   if ((byte_offset + length) > (pt.coeff_count() * bits_per_coeff_ / 8)) {
+    std::cout << "error debug = " << byte_offset <<  std::endl;
+    std::cout << "error debug = " << pt.coeff_count() <<  std::endl;
+    std::cout << "error debug = " << bits_per_coeff_  <<  std::endl;
     return InvalidArgumentError(
         "Requested decode beyond end of data in polynomial");
   }
+
+  std::cout << "xxxx2" << std::endl;
   size_t start_coeff_index = byte_offset * 8 / bits_per_coeff_;
   size_t coeff_bits =
       ((start_coeff_index + 1) * bits_per_coeff_) - (byte_offset * 8);
@@ -136,6 +144,8 @@ StatusOr<string> StringEncoder::decode(const Plaintext& pt, size_t length,
   if (length <= 0) {
     length = pt.significant_coeff_count() * bits_per_coeff_ / 8;
   }
+ 
+  std::cout << "xxxx3" << std::endl;
   string result(length, 0);
   size_t result_index = 0;
   size_t remain_bits = 8;
@@ -154,6 +164,7 @@ StatusOr<string> StringEncoder::decode(const Plaintext& pt, size_t length,
     }
     coeff_bits = bits_per_coeff_;
   }
+  std::cout << "xxxx" << std::endl;
   return result;
 }
 
