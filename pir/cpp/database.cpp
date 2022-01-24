@@ -292,7 +292,6 @@ StatusOr<vector<Ciphertext>> PIRDatabase::multiply(
     const seal::RelinKeys* const relin_keys,
     seal::Decryptor* const decryptor) const {
   auto& dimensions = context_->Params()->dimensions();
-  std::cout << "seal inner: " <<  context_->EncryptionParams().poly_modulus_degree() << std::endl;
   const size_t dim_sum = context_->DimensionsSum();
 
   if (selection_vector.size() != dim_sum) {
@@ -328,8 +327,6 @@ vector<uint32_t> PIRDatabase::calculate_indices(uint32_t index) {
 
 size_t PIRDatabase::calculate_item_offset(uint32_t index) {
   uint32_t pt_index = index / context_->Params()->items_per_plaintext();
-  std::cout << "calculate_item_offset: = " << pt_index << std::endl;
-  std::cout << "items_per_plaintext = " <<  context_->Params()->items_per_plaintext() << std::endl;
   return (index - (pt_index * context_->Params()->items_per_plaintext())) *
          context_->Params()->bytes_per_item();
 }

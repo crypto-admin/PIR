@@ -53,36 +53,15 @@ class GreeterServiceImpl final : public Query::Service {
     impl.SetUp();
     auto test_reply = impl.server_->ProcessRequest(*request);
     std::cout << "server ProcessRequest finish." << test_reply.ok() << std::endl;
-
     
     *reply = test_reply.value();
-    auto test = test_reply.value().reply(0).ct(0).length();
-    std::cout << "server ciphertext string " << test << std::endl;
-    std::cout << "server reply size" << (*reply).ByteSize() << std::endl;
-    // std::cout << "cipher text size " << response_proto.reply(i).ByteSize() << std::endl;
-
-    ////////////////////////////
-    std::vector<size_t> desired_indices = {5};
-    auto res = impl.client_->ProcessResponse(desired_indices, *reply);
-    if (res.ok()) std::cout << "server self process is ok" << std::endl;
-
-    ////////////////////////////
-    
-    std::cout << "reply size : "  << test_reply->reply_size() << std::endl;
-    
-    std::cout << "server reply :" << std::endl;
-
     return grpc::Status::OK;
   }
   // Hello imple just for test.
   grpc::Status sayHello(ServerContext* context, const HelloRequest* request,
                   HelloReply* reply) override {
     std::string prefix("Hello ");
-    //reply->set_message(prefix + request->name());
-    //
-    HelloReply test;
-    test.set_message(prefix + request->name());
-    *reply = test;
+    reply->set_message(prefix + request->name());
 
     return grpc::Status::OK;
   }

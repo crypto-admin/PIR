@@ -178,17 +178,9 @@ StatusOr<std::vector<string>> PIRClient::ProcessResponse(
 
   for (size_t i = 0; i < indexes.size(); ++i) {
     ASSIGN_OR_RETURN(auto result_pt, ProcessReply(response_proto.reply(i)));
-    std::cout << "cipher text size " << response_proto.reply(i).ByteSize() << std::endl;
-   
-    std::cout << "result pt = " << result_pt.to_string().size() << std::endl; 
-    // std::cout << "bytes per item " << db_->calculate_item_offset(indexes[i]) << std::endl;
-    std::cout << "bytes_per_intem value = " <<  context_->Params()->bytes_per_item() << std::endl;
-    std::cout << "plaintext coeff count =  " << result_pt.coeff_count() << std::endl;
-    // std::cout << "index[i] = " << indexes[i] << std::endl;
     ASSIGN_OR_RETURN(
         auto v, encoder.decode(result_pt, context_->Params()->bytes_per_item(),
                                db_->calculate_item_offset(indexes[i])));
-    std::cout << "encoder.decode ok"  << std::endl;
     result.push_back(v);
   }
   return result;
@@ -216,12 +208,9 @@ StatusOr<Plaintext> PIRClient::ProcessReplyCiphertextMult(
   const auto poly_modulus_degree =
       context_->EncryptionParams().poly_modulus_degree();
   seal::Plaintext pt(poly_modulus_degree, 0);
-  std::cout << "seal poly degree : " << poly_modulus_degree << std::endl;
-  std::cout << "seal pt.coeff_count init = " << pt.coeff_count() << std::endl;
 
   try {
     decryptor_->decrypt(reply_cts[0], pt);
-    std::cout << "seal pt.coeff_count = " << pt.coeff_count() << std::endl;
   } catch (const std::exception& e) {
     return InternalError(e.what());
   }
