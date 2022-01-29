@@ -94,9 +94,8 @@ int main() {
   std::vector<size_t> desired_indices = {desired_index};
 
   //self create reply;
-  PIRServerImpl impl(10), impl1(10);
+  PIRServerImpl impl(10);
   impl.SetUp();
-  impl1.SetUp();
   auto req_proto = impl.client_->CreateRequest(indices);
   if (req_proto.ok()) {
      std::cout << "req size = " << req_proto->query_size() << std::endl;
@@ -104,7 +103,8 @@ int main() {
 
   pir::Response reply = pirclient.SendQuery(*req_proto);
 
-  auto res = impl1.client_->ProcessResponse(desired_indices, reply);
+  impl.SetUp();
+  auto res = impl.client_->ProcessResponse(desired_indices, reply);
    
   if (res.ok()) {std::cout << "finish ok" << std::endl;}
   else std::cout << "error in ProcessResponse " << res.status() << std::endl;
