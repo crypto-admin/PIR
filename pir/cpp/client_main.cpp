@@ -106,8 +106,11 @@ int main() {
   impl.SetUp();
   auto res = impl.client_->ProcessResponse(desired_indices, reply);
    
-  if (res.ok()) {std::cout << "finish ok" << std::endl;}
-  else std::cout << "error in ProcessResponse " << res.status() << std::endl;
-
+  if (res.ok()) {
+    std::cout << "finish ok" << std::endl;
+    std::cout << "size = " << res.value()[0].data() << std::endl;
+  }else {
+    std::cout << "error in ProcessResponse " << res.status() << std::endl;
+  }
   return 0;
 }

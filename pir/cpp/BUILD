@@ -171,6 +171,23 @@ cc_test(
     ],
 )
 
+
+cc_test(
+    name = "pir_encode",
+    srcs = [
+       "string_encodermain.cpp",
+       "string_encoder.cpp",
+       "string_encoder.h",
+       "parameters.h",
+    ],
+    copts = PIR_DEFAULT_COPTS,
+    includes = PIR_DEFAULT_INCLUDES,
+    deps = [
+        ":pir",
+        "@com_google_absl//absl/status:statusor",
+    ],
+)
+
 cc_binary(
     name = "benchmark",
     srcs = [

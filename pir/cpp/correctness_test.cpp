@@ -60,9 +60,11 @@ class PIRCorrectnessTest
     const auto use_ciphertext_multiplication = get<0>(GetParam());
     const auto poly_modulus_degree = get<1>(GetParam());
     const auto plain_mod_bits = get<2>(GetParam());
-    const auto elem_size = get<3>(GetParam());
+    // const auto elem_size = get<3>(GetParam());
+    const auto elem_size = 16;
     const auto bits_per_coeff = get<4>(GetParam());
-    const auto dbsize = get<5>(GetParam());
+    //const auto dbsize = get<5>(GetParam());
+    const auto dbsize = 256;
     const auto d = get<6>(GetParam());
     
 
@@ -89,6 +91,7 @@ TEST_P(PIRCorrectnessTest, TestCorrectness) {
 
   ASSERT_EQ(results.size(), desired_indices.size());
   for (size_t i = 0; i < results.size(); ++i) {
+    std::cout << "result = " << results[i].c_str() << std::endl;
     ASSERT_EQ(results[i], string_db_[desired_indices[i]]) << "i = " << i;
   }
 }

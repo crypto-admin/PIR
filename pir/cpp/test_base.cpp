@@ -30,9 +30,12 @@ vector<string> generate_test_db(size_t db_size, size_t elem_size,
       seal::UniformRandomGeneratorFactory::DefaultFactory()->create({seed});
   vector<string> db(db_size, string(elem_size, 0));
   for (size_t i = 0; i < db_size; ++i) {
-    prng->generate(db[i].size(),
-                   reinterpret_cast<seal::SEAL_BYTE*>(db[i].data()));
+     // prng->generate(db[i].size(),
+                // reinterpret_cast<seal::SEAL_BYTE*>(db[i].data()));
+    for (int j = 0; j < db[i].size(); ++j) db[i][j] ='a' + rand() % 26;
   }
+  // std::cout << "testdb = " << elem_size << std::endl;
+  // for ( auto c : db) std::cout << "db ele: " << c << std::endl;
   return db;
 }
 
