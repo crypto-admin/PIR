@@ -62,6 +62,7 @@ cc_binary(
     name = "pir_client",
     srcs = [
         "client_main.cpp",
+        "client_impl.h",
         "client.cpp",
         "context.cpp",
         "context.h",

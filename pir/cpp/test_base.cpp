@@ -35,7 +35,7 @@ vector<string> generate_test_db(size_t db_size, size_t elem_size,
     for (int j = 0; j < db[i].size(); ++j) db[i][j] ='a' + rand() % 26;
   }
   // std::cout << "testdb = " << elem_size << std::endl;
-  // for ( auto c : db) std::cout << "db ele: " << c << std::endl;
+  for ( auto c : db) std::cout << "db ele: " << c << std::endl;
   return db;
 }
 

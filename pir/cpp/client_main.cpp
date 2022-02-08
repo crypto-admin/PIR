@@ -1,6 +1,7 @@
 #include "pir/cpp/client.h"
 #include "seal/seal.h"
-#include "pir/cpp/server_impl.h"
+// #include "pir/cpp/server_impl.h"
+#include "pir/cpp/client_impl.h"
 
 // add by byte
 #include "pir/proto/payload.grpc.pb.h"
@@ -94,7 +95,8 @@ int main() {
   std::vector<size_t> desired_indices = {desired_index};
 
   //self create reply;
-  PIRServerImpl impl(10);
+  // PIRServerImpl impl(10);
+  PIRClientImpl impl(10);
   impl.SetUp();
   auto req_proto = impl.client_->CreateRequest(indices);
   if (req_proto.ok()) {
@@ -103,12 +105,12 @@ int main() {
 
   pir::Response reply = pirclient.SendQuery(*req_proto);
 
-  impl.SetUp();
+  // impl.SetUp();
   auto res = impl.client_->ProcessResponse(desired_indices, reply);
    
   if (res.ok()) {
     std::cout << "finish ok" << std::endl;
-    std::cout << "size = " << res.value()[0].data() << std::endl;
+    std::cout << "size = " << (*res)[0].substr(0, 10) << std::endl;
   }else {
     std::cout << "error in ProcessResponse " << res.status() << std::endl;
   }

@@ -20,7 +20,7 @@ class PIRClientImpl {
     SetUpDB(db_size_); 
   }
 
-  void SetUpDB(size_t dbsize, size_t dimensions = 1, size_t elem_size = 7680,
+  void SetUpDB(size_t dbsize, size_t dimensions = 1, size_t elem_size = 128,
                bool use_ciphertext_multiplication = true) {
     db_size_ = dbsize;
     encryption_params_ = GenerateEncryptionParams(POLY_MODULUS_DEGREE, 20);

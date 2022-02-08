@@ -49,12 +49,25 @@ using namespace std;
 class GreeterServiceImpl final : public Query::Service {
   grpc::Status sendQuery(ServerContext* context, const Request* request,
                  Response* reply) override {
-    PIRServerImpl impl = PIRServerImpl(10);
+    PIRServerImpl impl(10);
     impl.SetUp();
+    const vector<size_t> indices = {5};
+    auto req_proto = impl.client_->CreateRequest(indices);
+
     auto test_reply = impl.server_->ProcessRequest(*request);
+    // auto test_reply = impl.server_->ProcessRequest(*req_proto);
     std::cout << "server ProcessRequest finish." << test_reply.ok() << std::endl;
     
     *reply = test_reply.value();
+    std::vector<size_t> desired_indices = {5};                                            
+    auto res = impl.client_->ProcessResponse(desired_indices, *test_reply);
+    
+    if (res.ok()) {
+      std::cout << "finish ok" << std::endl;
+      std::cout << "size = " << (*res)[0].c_str() << std::endl;
+    }else {
+      std::cout << "error in ProcessResponse " << res.status() << std::endl;
+    }
     return grpc::Status::OK;
   }
   // Hello imple just for test.

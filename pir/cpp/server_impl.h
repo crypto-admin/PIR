@@ -34,22 +34,23 @@ using std::int64_t;
 using std::vector;
 
 constexpr uint32_t POLY_MODULUS_DEGREE = 4096;
-constexpr uint32_t ELEM_SIZE = 7680;
+constexpr uint32_t ELEM_SIZE = 128;
 
 class PIRServerInit : public PIRTestingBase {
   public:
   void SetUpDBImpl(size_t dbsize, size_t dimensions = 1,
                    size_t elem_size = ELEM_SIZE,
                    uint32_t plain_mod_bit_size = 20,
-                   bool use_ciphertext_multiplication = false) {
+                   bool use_ciphertext_multiplication = true) {
     SetUpParams(dbsize, elem_size, dimensions, POLY_MODULUS_DEGREE,
                 plain_mod_bit_size, 0, use_ciphertext_multiplication);
-    GenerateIntDB();
+    // GenerateIntDB();
+    GenerateDB();
     SetUpSealTools();
 
-    gal_keys_ =
-        keygen_->galois_keys_local(generate_galois_elts(POLY_MODULUS_DEGREE));
-    relin_keys_ = keygen_->relin_keys_local();
+    // gal_keys_ =
+         // keygen_->galois_keys_local(generate_galois_elts(POLY_MODULUS_DEGREE));
+    // relin_keys_ = keygen_->relin_keys_local();
 
     server_ = *(PIRServer::Create(pir_db_, pir_params_));
     client_ = *(PIRClient::Create(pir_params_));
@@ -58,8 +59,8 @@ class PIRServerInit : public PIRTestingBase {
 
   unique_ptr<PIRServer> server_;
   unique_ptr<PIRClient> client_;
-  GaloisKeys gal_keys_;
-  RelinKeys relin_keys_;
+  // GaloisKeys gal_keys_;
+  // RelinKeys relin_keys_;
 };
 
 class PIRServerImpl : public PIRServerInit {
