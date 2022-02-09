@@ -25,3 +25,6 @@ Build and run benchmarks
 ```
 bazel run -c opt //pir/cpp:benchmark
 ```
+
+# update version conflict:
+bazel build --cxxopt=-std=c++17 //pir/cpp:pir_server
