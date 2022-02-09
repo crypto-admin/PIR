@@ -39,6 +39,15 @@ using absl::StatusOr;
 
 constexpr uint32_t DEFAULT_POLY_MODULUS_DEGREE = 4096;
 
+struct pirparams {
+  uint32_t poly_modulus_degree;
+  uint32_t ele_size;
+  uint8_t dimensions;
+  uint32_t plain_mod_bit_size;
+  bool use_ciphertext_multiplication;
+  uint64_t db_size;
+};
+
 /**
  * Helper function to generate encryption parameters.
  * @param[in] optional The polynomial modulus degree

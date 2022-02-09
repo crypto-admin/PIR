@@ -17,6 +17,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <string>
 
@@ -45,29 +46,33 @@ using namespace pir;
 using namespace std;
 
 
+// struct pirparams {
+//   uint32_t poly_modulus_degree;
+//   uint32_t ele_size;
+//   uint8_t dimensions;
+//   uint32_t plain_mod_bit_size;
+//   bool use_ciphertext_multiplication;
+//   uint64_t db_size;
+// };
+pirparams onlineparam = {4096, 128, 1, 20, true, 1000000}; 
+uint8_t param_size = 6;
+
 // Logic and data behind the server's behavior.
-class GreeterServiceImpl final : public Query::Service {
+class PIRServiceImpl final : public Query::Service {
+ public:
+  PIRServiceImpl(pirparams onlineparam) {
+     impl_ = make_unique<PIRServerImpl>(onlineparam);
+     impl_->SetUp();
+  }
   grpc::Status sendQuery(ServerContext* context, const Request* request,
                  Response* reply) override {
-    PIRServerImpl impl(10);
-    impl.SetUp();
-    const vector<size_t> indices = {5};
-    auto req_proto = impl.client_->CreateRequest(indices);
-
-    auto test_reply = impl.server_->ProcessRequest(*request);
-    // auto test_reply = impl.server_->ProcessRequest(*req_proto);
-    std::cout << "server ProcessRequest finish." << test_reply.ok() << std::endl;
-    
+  
+    auto test_reply = impl_->server_->ProcessRequest(*request);  
     *reply = test_reply.value();
-    std::vector<size_t> desired_indices = {5};                                            
-    auto res = impl.client_->ProcessResponse(desired_indices, *test_reply);
-    
-    if (res.ok()) {
-      std::cout << "finish ok" << std::endl;
-      std::cout << "size = " << (*res)[0].c_str() << std::endl;
-    }else {
-      std::cout << "error in ProcessResponse " << res.status() << std::endl;
-    }
+
+    // TODO : add log file, to list every process request;
+    std::cout << "server ProcessRequest finish." << test_reply.ok() << std::endl;
+
     return grpc::Status::OK;
   }
   // Hello imple just for test.
@@ -78,11 +83,13 @@ class GreeterServiceImpl final : public Query::Service {
 
     return grpc::Status::OK;
   }
+ private:
+  unique_ptr<PIRServerImpl> impl_;
 };
 
 void RunServer() {
   std::string server_address("0.0.0.0:50051");
-  GreeterServiceImpl service;
+  PIRServiceImpl service(onlineparam);
 
   grpc::EnableDefaultHealthCheckService(true);
   // grpc::reflection::InitProtoReflectionServerBuilderPlugin();
@@ -101,8 +108,40 @@ void RunServer() {
   server->Wait();
 }
 
-int main(int argc, char** argv) {
-  RunServer();
+// read server params from config file, as csv, json..
+int parserparam() {
+  string config;
+  ifstream config_file("server_config.csv", ios::in);
+  if (!config_file.is_open()) {
+    std::cout << "open config file fail." << std::endl;
+    return 1;
+  }
+  uint32_t param_temp[param_size]; // 7 is para num of pirparams
+  int index = 0;
+  while (getline(config_file, config)) {
+    param_temp[index] = atoi(config.c_str());
+    index++;
+    if (index > param_size) break;
+  }
+  if (index == param_size) {
+    onlineparam.poly_modulus_degree = param_temp[0];
+    onlineparam.ele_size = param_temp[1];
+    onlineparam.dimensions = param_temp[2];
+    onlineparam.plain_mod_bit_size = param_temp[3];
+    onlineparam.use_ciphertext_multiplication = param_temp[4]; // int to bool;
+    onlineparam.db_size = param_temp[5];
+  } else {
+    return 2; // param size error;
+  }
+  
+  return 0;
+}
 
+int main(int argc, char** argv) {
+  int res =  parserparam();
+  if (res != 0) {
+    std::cout << "read config file error, error code = " << res << std::endl;
+  }
+  RunServer();
   return 0;
 }

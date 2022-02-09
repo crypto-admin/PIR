@@ -7,9 +7,10 @@
 #include "pir/proto/payload.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 
-
-//
 #include "parameters.h"
+#include <fstream>
+#include <string>
+
 ///////////////
 
 // add by byte
@@ -25,6 +26,16 @@ using pir::HelloReply;
 using namespace pir; 
 
 
+// struct pirparams {
+//   uint32_t poly_modulus_degree;
+//   uint32_t ele_size;
+//   uint8_t dimensions;
+//   uint32_t plain_mod_bit_size;
+//   bool use_ciphertext_multiplication;
+//   uint64_t db_size;
+// };
+pirparams onlineparam = {4096, 128, 1, 20, true, 1000000}; 
+uint8_t param_size = 6;
 
 class PirQuery {
  public:
@@ -78,10 +89,44 @@ class PirQuery {
   std::unique_ptr<Query::Stub> stub_;
 };
 
+// read server params from config file, as csv, json..
+int parserparam() {
+  string config;
+  ifstream config_file("client_config.csv", ios::in);
+  if (!config_file) {
+    std::cout << "open config file fail." << std::endl;
+    return 1;
+  }
+  uint32_t param_temp[param_size]; // 7 is para num of pirparams
+  int index = 0;
+  while (getline(config_file, config)) {
+    param_temp[index] = atoi(config.c_str());
+    index++;
+    if (index > param_size) break;
+  }
+  if (index == param_size) {
+    onlineparam.poly_modulus_degree = param_temp[0];
+    onlineparam.ele_size = param_temp[1];
+    onlineparam.dimensions = param_temp[2];
+    onlineparam.plain_mod_bit_size = param_temp[3];
+    onlineparam.use_ciphertext_multiplication = param_temp[4]; // int to bool;
+    onlineparam.db_size = param_temp[5];
+  } else {
+    return 2; // param size error;
+  }
+  
+  return 0;
+}
+
 int main() {
   int ret = 0;
   std::string target_str = "localhost:50051";
   PirQuery pirclient(grpc::CreateChannel(target_str, grpc::InsecureChannelCredentials()));
+
+  int config_res = parserparam();
+  if (config_res != 0) {
+    std::cout << "read config file error, error code = " << config_res << std::endl;
+  }
 
   // generate query;
 #ifdef DEBUG
@@ -94,13 +139,13 @@ int main() {
   const vector<size_t> indices = {desired_index};
   std::vector<size_t> desired_indices = {desired_index};
 
-  //self create reply;
-  // PIRServerImpl impl(10);
-  PIRClientImpl impl(10);
+  PIRClientImpl impl(onlineparam);
   impl.SetUp();
   auto req_proto = impl.client_->CreateRequest(indices);
   if (req_proto.ok()) {
-     std::cout << "req size = " << req_proto->query_size() << std::endl;
+     std::cout << "client generate request, size = " << req_proto->query_size() << std::endl;
+  } else {
+    std::cout << "client generate request fail." << std::endl;
   }
 
   pir::Response reply = pirclient.SendQuery(*req_proto);
@@ -109,8 +154,8 @@ int main() {
   auto res = impl.client_->ProcessResponse(desired_indices, reply);
    
   if (res.ok()) {
-    std::cout << "finish ok" << std::endl;
-    std::cout << "size = " << (*res)[0].substr(0, 10) << std::endl;
+    std::cout << "client finish query, get the following data: " << std::endl;
+    std::cout << (*res)[0].substr(0, 10) << std::endl;
   }else {
     std::cout << "error in ProcessResponse " << res.status() << std::endl;
   }

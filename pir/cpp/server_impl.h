@@ -11,8 +11,7 @@
 #include "pir/cpp/utils.h"
 
 namespace pir {
-namespace {
-
+namespace {  // local const;
 using std::cout;
 using std::endl;
 using std::get;
@@ -34,12 +33,35 @@ using std::int64_t;
 using std::vector;
 
 constexpr uint32_t POLY_MODULUS_DEGREE = 4096;
-constexpr uint32_t ELEM_SIZE = 128;
+// constexpr uint32_t ELEM_SIZE = 128;
 
-class PIRServerInit : public PIRTestingBase {
-  public:
-  void SetUpDBImpl(size_t dbsize, size_t dimensions = 1,
-                   size_t elem_size = ELEM_SIZE,
+// struct pirparams {
+//   uint32_t poly_modulus_degree;
+//   uint32_t ele_size;
+//   uint8_t dimensions;
+//   uint32_t plain_mod_bit_size;
+//   bool use_ciphertext_multiplication;
+//   uint64_t db_size;
+// };
+ 
+pirparams testparam = {4096, 128, 1, 20, true, 10}; 
+
+class PIRServerImpl : public PIRTestingBase {
+ public:
+  PIRServerImpl (pirparams param = testparam) {
+    // db_size_ = db_size;
+    param_  = param;
+  }
+
+  void SetUp() {   
+    SetUpDBImpl(param_.db_size, 
+                param_.ele_size, 
+                param_.dimensions,  
+                param_.plain_mod_bit_size, 
+                param_.use_ciphertext_multiplication); 
+   }
+
+  void SetUpDBImpl(size_t dbsize, size_t elem_size, size_t dimensions = 1, 
                    uint32_t plain_mod_bit_size = 20,
                    bool use_ciphertext_multiplication = true) {
     SetUpParams(dbsize, elem_size, dimensions, POLY_MODULUS_DEGREE,
@@ -53,29 +75,16 @@ class PIRServerInit : public PIRTestingBase {
     // relin_keys_ = keygen_->relin_keys_local();
 
     server_ = *(PIRServer::Create(pir_db_, pir_params_));
-    client_ = *(PIRClient::Create(pir_params_));
+    client_ = *(PIRClient::Create(pir_params_));  // client is for test;
     // TODO: add assert here.
   }
 
   unique_ptr<PIRServer> server_;
-  unique_ptr<PIRClient> client_;
+  unique_ptr<PIRClient> client_;  // just for test;
+  // int db_size_;
+  pirparams param_;
   // GaloisKeys gal_keys_;
   // RelinKeys relin_keys_;
-};
-
-class PIRServerImpl : public PIRServerInit {
- public:
-   PIRServerImpl (int db_size) {
-    db_size_ = db_size;
-  }
-  
-  void SetUp() { SetUpDB(db_size_); }
-  void SetUpDB(size_t dbsize, size_t dimensions = 1,
-               size_t elem_size = ELEM_SIZE, uint32_t plain_mod_bit_size = 20) {
-    SetUpDBImpl(dbsize, dimensions, elem_size, plain_mod_bit_size, true); // TODO :use ciphertext multiplication
-  }
- 
-  int db_size_;
 };
 
 }
