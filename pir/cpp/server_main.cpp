@@ -54,7 +54,7 @@ using namespace std;
 //   bool use_ciphertext_multiplication;
 //   uint64_t db_size;
 // };
-pirparams onlineparam = {4096, 128, 1, 20, true, 1000000}; 
+pirparams onlineparam = {4096, 128, 2, 20, true, 100};
 uint8_t param_size = 6;
 
 // Logic and data behind the server's behavior.

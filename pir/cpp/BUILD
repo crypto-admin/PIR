@@ -94,7 +94,6 @@ cc_binary(
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:optional",
-        "@com_google_absl//absl/types:span",
         "@com_microsoft_seal//:seal",
         "@com_github_grpc_grpc//:grpc++",
         "@com_google_googletest//:gtest",
@@ -167,6 +166,7 @@ cc_test(
     deps = [
         ":pir",
         "@com_google_absl//absl/status:statusor",
+        
         "@com_google_googletest//:gtest",
         "@com_google_googletest//:gtest_main",
     ],

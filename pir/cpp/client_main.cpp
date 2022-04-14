@@ -34,7 +34,7 @@ using namespace pir;
 //   bool use_ciphertext_multiplication;
 //   uint64_t db_size;
 // };
-pirparams onlineparam = {4096, 128, 1, 20, true, 1000000}; 
+pirparams onlineparam = {4096, 128, 2, 20, true, 100}; 
 uint8_t param_size = 6;
 
 class PirQuery {
@@ -149,14 +149,13 @@ int main() {
   }
 
   pir::Response reply = pirclient.SendQuery(*req_proto);
-
-  // impl.SetUp();
+  
   auto res = impl.client_->ProcessResponse(desired_indices, reply);
    
   if (res.ok()) {
     std::cout << "client finish query, get the following data: " << std::endl;
-    std::cout << (*res)[0].substr(0, 10) << std::endl;
-  }else {
+    std::cout << (*res)[0].c_str() << std::endl;
+  } else {
     std::cout << "error in ProcessResponse " << res.status() << std::endl;
   }
   return 0;

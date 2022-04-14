@@ -64,6 +64,7 @@ class PIRServerImpl : public PIRTestingBase {
   void SetUpDBImpl(size_t dbsize, size_t elem_size, size_t dimensions = 1, 
                    uint32_t plain_mod_bit_size = 20,
                    bool use_ciphertext_multiplication = true) {
+                     std::cout << "server db dimension = " << dimensions << std::endl;
     SetUpParams(dbsize, elem_size, dimensions, POLY_MODULUS_DEGREE,
                 plain_mod_bit_size, 0, use_ciphertext_multiplication);
     // GenerateIntDB();

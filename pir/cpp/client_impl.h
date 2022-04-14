@@ -25,13 +25,13 @@ class PIRClientImpl {
     // db_size_ = db_size;
     param_ = param;
   }
-  void SetUp() {    
+  void SetUp() {   
     SetUpDB(param_.db_size, param_.dimensions, param_.ele_size, param_.use_ciphertext_multiplication); 
   }
 
   void SetUpDB(size_t dbsize, size_t dimensions = 1, size_t elem_size = 128,
                bool use_ciphertext_multiplication = true) {
-    encryption_params_ = GenerateEncryptionParams(POLY_MODULUS_DEGREE, 20);
+    encryption_params_ = GenerateEncryptionParams(POLY_MODULUS_DEGREE, 20);  // TODO: update 20 t0 plain mod
     pir_params_ =
         *(CreatePIRParameters(dbsize, elem_size, dimensions, encryption_params_,
                               use_ciphertext_multiplication));
